@@ -1,34 +1,34 @@
 terraform {
-    required_providers {
-        aws = {
-            source = "hashicorp/aws"
-            version = "4.8.0"
-        }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "4.8.0"
     }
+  }
 
-    backend "s3" {
-        # Does not seem to be possible to use variables here. Hardcode for now.
-        bucket = "terraform.grahamwright.net"
-        region = "us-east-1"
-        key = "gitops/learning/dev/terraform.tfstate"
-        # dynamodb_table = "<SOME_TABLE>"
-    }
+  backend "s3" {
+    # Does not seem to be possible to use variables here. Hardcode for now.
+    bucket = "terraform.grahamwright.net"
+    region = "us-east-1"
+    key    = "gitops/learning/dev/terraform.tfstate"
+    # dynamodb_table = "<SOME_TABLE>"
+  }
 }
 
 provider "aws" {
-    region = "${var.default_region}"
-    shared_credentials_files = ["~/.aws/credentials"]
-    profile = "AWSCLI"
+  region                   = var.default_region
+  shared_credentials_files = ["~/.aws/credentials"]
+  profile                  = "AWSCLI"
 }
 
 # Retrieve the default vpc for the region
 data "aws_vpc" "default" {
-    default = true
+  default = true
 }
 
 data "aws_subnet_ids" "all_default_subnets" {
-    # Passing the VPC ID in for the execution.
-    vpc_id = data.aws_vpc.default.id
+  # Passing the VPC ID in for the execution.
+  vpc_id = data.aws_vpc.default.id
 }
 
 # IAM Role for batch processing
@@ -51,10 +51,10 @@ resource "aws_iam_role" "batch_role" {
 }
     EOF
 
-    tags = {
-        created-by = "terraform"
-    }
-    }
+  tags = {
+    created-by = "terraform"
+  }
+}
 
 # Attach the Batch policy to the Batch role
 resource "aws_iam_role_policy_attachment" "policy_attachment" {
@@ -64,18 +64,18 @@ resource "aws_iam_role_policy_attachment" "policy_attachment" {
 
 # Security Group for batch processing
 resource "aws_security_group" "batch_security_group" {
-    name        = "batch_security_group"
-    description = "AWS Batch Security Group for batch jobs"
-    vpc_id      = data.aws_vpc.default.id
+  name        = "batch_security_group"
+  description = "AWS Batch Security Group for batch jobs"
+  vpc_id      = data.aws_vpc.default.id
 
-    egress {
-        from_port   = 0
-        to_port     = 65535
-        protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-    
-    tags = {
-        created-by = "terraform"
-    }
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    created-by = "terraform"
+  }
 }
