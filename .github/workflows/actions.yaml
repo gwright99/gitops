@@ -54,7 +54,7 @@ jobs:
       # see steps.
       - name: add-plan-comment
         id: comment
-        uses: actions/github-scripts@v3
+        uses: actions/github-script@v3
         if: github.event_name == 'pull_request'
         env:
           # Access to the output from the previous steps' stdout
