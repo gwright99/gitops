@@ -79,3 +79,11 @@ resource "aws_security_group" "batch_security_group" {
     created-by = "terraform"
   }
 }
+
+module "create_S3_bucket" {
+    source = "../../modules/S3/testbucket"
+    tag_for_bucket = "made_with_tf"
+    # These are the vars defined in /setups/dev/
+    environment = var.environment
+    project = var.project
+}
