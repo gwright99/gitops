@@ -55,7 +55,7 @@ jobs:
       - name: add-plan-comment
         id: comment
         uses: actions/github-scripts@v3
-        if: github.event_name =- 'pull_request'
+        if: github.event_name == 'pull_request'
         env:
           # Access to the output from the previous steps' stdout
           # Format and validation steps are blank because we dont have these defined.
