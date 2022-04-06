@@ -17,8 +17,8 @@ terraform {
 
 provider "aws" {
   region                   = var.default_region
-#   shared_credentials_files = ["~/.aws/credentials"]
-#   profile                  = "AWSCLI"
+  # shared_credentials_files = ["~/.aws/credentials"]
+  # profile                  = "AWSCLI"
 }
 
 # Retrieve the default vpc for the region
@@ -86,4 +86,22 @@ module "create_S3_bucket" {
     # These are the vars defined in /setups/dev/
     environment = var.environment
     project = var.project
+}
+
+# Lambda: https://learn.hashicorp.com/tutorials/terraform/lambda-api-gateway
+data "archive_file" "lambda_hello_world" {
+  type = "zip"
+
+  #source_dir = "${path.module}/hello-world"
+  source_dir = "../../src/hello-world"
+  output_path = "../../src/hello-world.zip"
+}
+
+resource "aws_s3_object" "lambda_hello_world" {
+  # Note the reference to module here
+  bucket = module.create_S3_bucket.bucket1#.id
+  key = "hello-world.zip"
+  source = data.archive_file.lambda_hello_world.output_path
+
+  etag = filemd5(data.archive_file.lambda_hello_world.output_path)
 }
