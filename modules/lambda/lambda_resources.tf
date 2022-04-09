@@ -16,11 +16,8 @@ resource "aws_s3_bucket_acl" "bucket1" {
 
 # Deploy Lambda via TF: https://learn.hashicorp.com/tutorials/terraform/lambda-api-gateway
 data "archive_file" "lambda_hello_world" {
-  type = "zip"
 
-  #source_dir = "${path.module}/hello-world"
-#   source_dir = "../src/hello-world"
-#   output_path = "../src/hello-world.zip"
+  type = "zip"
   source_dir = "${var.main_args.tf_root}/src/hello-world"
   output_path = "${var.main_args.tf_root}/src/hello-world.zip"
 }
