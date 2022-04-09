@@ -25,7 +25,8 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./setups/dev
+        # working-directory: ./setups/dev
+        working-directory: ./dev
 
     steps:
       # Checkout the repository to the GHA runner
