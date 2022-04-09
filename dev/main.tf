@@ -17,8 +17,8 @@ terraform {
 
 provider "aws" {
   region                   = var.default_region
-  shared_credentials_files = ["~/.aws/credentials"]
-  profile                  = "AWSCLI"
+  # shared_credentials_files = ["~/.aws/credentials"]
+  # profile                  = "AWSCLI"
 }
 
 locals {
