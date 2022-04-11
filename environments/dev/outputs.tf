@@ -1,3 +1,3 @@
 output "root_path" {
-  value = local.tf_root
+  value = local.context.tf_root
 }

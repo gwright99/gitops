@@ -26,7 +26,7 @@ jobs:
       run:
         shell: bash
         # working-directory: ./setups/dev
-        working-directory: ./dev
+        working-directory: ./environments/dev
 
     steps:
       # Checkout the repository to the GHA runner
