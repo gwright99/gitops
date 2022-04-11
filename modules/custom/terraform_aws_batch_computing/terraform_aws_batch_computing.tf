@@ -15,22 +15,6 @@ data "aws_subnets" "all_default_subnets" {
   }
 }
 
-# Inline JSON can't have leading spaces. Externalize to TFTPL file.
-# Use variables to keep the amount of "../" to a minimum.
-resource "aws_iam_role" "batch_role" {
-  name               = "batch_role"
-  assume_role_policy = templatefile(
-    "${var.tf_root}/assets/templates/batch_role.tftpl", {})
-
-  tags = var.tf_common_tags
-}
-
-# Attach the Batch policy to the Batch role
-resource "aws_iam_role_policy_attachment" "policy_attachment" {
-  role       = aws_iam_role.batch_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
-}
-
 # Security Group for batch processing
 resource "aws_security_group" "batch_security_group" {
   name        = "batch_security_group"
@@ -44,5 +28,5 @@ resource "aws_security_group" "batch_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = var.tf_common_tags
+  tags = var.context.common_tags
 }

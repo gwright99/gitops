@@ -4,9 +4,9 @@ terraform {
 
 resource "aws_s3_bucket" "bucket1" {
     # bucket = "${var.project}-${var.environment}-grahamwright.net"
-    bucket = "${var.main_args.resource_group}-grahamwright.net"
+    bucket = "${var.context.resource_group}-grahamwright.net"
 
-    tags = var.main_args.common_tags
+    tags = var.context.common_tags
 }
 
 resource "aws_s3_bucket_acl" "bucket1" {
@@ -18,8 +18,8 @@ resource "aws_s3_bucket_acl" "bucket1" {
 data "archive_file" "lambda_hello_world" {
 
   type = "zip"
-  source_dir = "${var.main_args.tf_root}/src/hello-world"
-  output_path = "${var.main_args.tf_root}/src/hello-world.zip"
+  source_dir = "${var.context.tf_root}/src/hello-world"
+  output_path = "${var.context.tf_root}/src/hello-world.zip"
 }
 
 resource "aws_s3_object" "lambda_hello_world" {
@@ -44,5 +44,15 @@ resource "aws_lambda_function" "hello_world" {
 
   source_code_hash = data.archive_file.lambda_hello_world.output_base64sha256
   # role = aws_iam_role.lambda_exec.arn
-  role = var.lambda_exec_role_arn
+  role = var.lambda_execution_role_arn
+
+  tags = var.context.common_tags
+
+}
+
+resource "aws_cloudwatch_log_group" "hello_world" {
+  name = "/aws/lambda/${aws_lambda_function.hello_world.function_name}"
+
+  retention_in_days = 30
+  tags = var.context.common_tags
 }
