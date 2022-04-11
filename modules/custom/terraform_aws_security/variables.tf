@@ -1,4 +1,4 @@
-variable "main_args" {
+variable "context" {
   type = object({
     tf_root = string
     resource_group = string

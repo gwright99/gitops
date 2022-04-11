@@ -15,11 +15,13 @@ terraform {
   }
 }
 
+
 provider "aws" {
   region                   = var.default_region
   # shared_credentials_files = ["~/.aws/credentials"]
   # profile                  = "AWSCLI"
 }
+
 
 locals {
   # Since idea won't work since you can't put variables into module 
@@ -47,31 +49,29 @@ locals {
   }
 }
 
-module "my_iam_resources" {
-  source = "../modules/iam"
 
-  main_args = local.context
+module "terraform_aws_security" {
+  source = "../modules/custom/terraform_aws_security"
+
+  context = local.context
 }
 
-module "my_batch_resources" {
-  source = "../modules/batch"
+module "terraform_aws_application" {
+  source = "../modules/custom/terraform_aws_application"
 
-  tf_root = local.tf_root
-  tf_common_tags = local.common_tags
+  context = local.context
+  lambda_execution_role_arn = module.terraform_aws_security.lambda_execution_role_arn
+
+  depends_on = [
+    module.terraform_aws_security
+  ]
 }
 
-module "my_lambda_resources" {
-  source = "../modules/lambda"
 
-  main_args = local.context
-  lambda_exec_role_arn = module.my_iam_resources.lambda_exec_role_arn
-}
+module "terraform_aws_batch_computing" {
+  source = "../modules/custom/terraform_aws_batch_computing"
 
-module "my_cloudwatch_resources" {
-  source = "../modules/cloudwatch"
-
-  main_args = local.context
-  lambda_function_name = module.my_lambda_resources.lambda_function_name
+  context = local.context
 }
 
 

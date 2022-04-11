@@ -8,7 +8,7 @@
 #     description = "Common tags passed in by main.tf"
 # }
 
-variable "main_args" {
+variable "context" {
   type = object({
     tf_root = string
     resource_group = string
@@ -17,7 +17,7 @@ variable "main_args" {
   description = "Locals from main"
 }
 
-variable "lambda_exec_role_arn" {
+variable "lambda_execution_role_arn" {
   type = string
   description = "The arn of the IAM Role created for Lambda."
 }
