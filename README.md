@@ -75,7 +75,7 @@ I found this technique half way through, so the `batch` module still uses the ol
 More notes to follow as I continue exploring the technology.
 
 ## To Do
-- [x] Reorganize modules (again). Move cloudwatch functionality into Lambda. Rename modules to fit best practice naming convention e.g. "custom-tf-aws-security"
+- :white_check_mark: Reorganize modules (again). Move cloudwatch functionality into Lambda. Rename modules to fit best practice naming convention e.g. "custom-tf-aws-security"
 - [ ] Determine if there is an easier way to reference a module resource from another module without having to align output/variable/main.tf files.
 - [x] Re-implement an `environments` folder to clean up the root level.
 - [x] Implement context variable in batch module.
