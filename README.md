@@ -13,6 +13,7 @@ An early tutorial I followed had the environments stashed under a `setups/` fold
 
 As I look at the directory structure now, I think removal of the top-level environment folder was a mistake. This layer will get messier as additional environments are added, and the fact that I've found a clean way to pass in an absolute path for the root directory has simplified my file references elsewhere in the repository.
 
+
 ### Issue 2: Resource Decomposition (i.e. Modules)
 The monolith was easy to work with since there were only a few files. It was readily apparent, however, that it would be quickly become unwieldly if I kept on adding even minor bits of new functionality.
 
@@ -28,6 +29,29 @@ I decided to implement modules. This required a surprising amount of rework and 
 3. The now-mostly-separated-but-still-related modules became more complicated to look at. Resources within the module were referencing resources within itself but also inter-module resources. I noticed it was taking me more effort to keep track of what was coming from where.
 
 This problem may be somewhat negated by my choosing of better, harmonized names, so that future changes can be a simple "find and replace" but I'm not there yet. It may also be alleviated if I'm able to find a better reference technique (I have not found one yet). As of today, I'm leaning towards "mini-monoliths" on business-functionality grounds (e.g. mix IAM, Lambda, and S3 resources within a single module that creates a Lambda) rather than a logical division based on specific AWS services (e.g. separate IAM, Lambda, S3).
+
+The mini-monolith approach seems to be what Hashicorp itself recommends. In [this example](https://github.com/cloudposse/terraform-aws-utils/blob/master/context.tf), they suggest breaking up a traditional 3-tier web application into the following modules:
+* Network
+    * ACLs, NAT Gateway, VPC, subnets, peering, and direct connect
+    * High privilege & low volatility - these won't change often so it makes sense to gropu them in their own module to protect from unnecessary churn and risk.
+* Web
+    * ALB, ASG, EC2 instances, S3 buckets, Security Groups, and logging.
+    * Use a pre-built AMI (via Packer) with latest web application code.
+    * These are highly encapsulated (focused only on web-app) and have high volatility.
+* App
+    * ALB, ASG, EC2 instances, S3 buckets, Security Groups, and logging.
+    * Use a pre-built AMI (via Packer) with latest app tier code.
+    * These are highly encapsulated (focused only on web-app) and have high volatility.
+* Database
+    * RDS, associated storage, backup data, logging, etc.
+    * Highly privileged and low volatility. Not going to set up the db too often and not many folks should be able to modify these resources.
+* Routing
+    * Route53, Hosted Zones, Private Hosted Zones.
+    * Highly privileged and low volatility.
+* Security
+    * IAM resources, maybe Security Groups, MFA
+    * Highly privileged and low volatility.
+
 
 ### Issue 3: Single-Sourcing Variables
 I don't appear able to use variables when defining the `source` path to modules, so some hard-coded relative pathing is necessary to point the `main.tf` to associated modules.
@@ -45,10 +69,14 @@ Each module can have the context variable defined based on a template, which all
 
 I found this technique half way through, so the `batch` module still uses the old way of passing in variables individually whereas modules I built afterwards use the context variable.
 
+
+
 ### More to follow
 More notes to follow as I continue exploring the technology.
 
 ## To Do
+* Reorganize modules (again). Move cloudwatch functionality into Lambda. Rename modules to fit best practice naming convention e.g. "custom-tf-aws-security"
 * Determine if there is an easier way to reference a module resource from another module without having to align output/variable/main.tf files.
 * Re-implement an `environments` folder to clean up the root level.
 * Implement context variable in batch module.
+* Generate Changelog as per [https://www.freecodecamp.org/news/a-beginners-guide-to-git-what-is-a-changelog-and-how-to-generate-it/](https://www.freecodecamp.org/news/a-beginners-guide-to-git-what-is-a-changelog-and-how-to-generate-it/)
